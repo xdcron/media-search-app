@@ -41,7 +41,6 @@ export function useAuthForm<T extends FormData>({
   async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
 
-    // Run form validation if provided
     if (validateForm) {
       const validationError = validateForm(formData);
       if (validationError) {
@@ -67,9 +66,7 @@ export function useAuthForm<T extends FormData>({
           ? "Failed to log in"
           : "Failed to create an account";
 
-      // Handle different error codes
       switch (err.code) {
-        // Login errors
         case "auth/invalid-credential":
           errorMessage = "Invalid email or password";
           break;
@@ -79,8 +76,6 @@ export function useAuthForm<T extends FormData>({
         case "auth/wrong-password":
           errorMessage = "Incorrect password";
           break;
-
-        // Signup errors
         case "auth/email-already-in-use":
           errorMessage = "Email is already in use";
           break;
