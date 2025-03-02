@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   useQueryClient,
   useInfiniteQuery,
@@ -20,6 +20,7 @@ export function useBookSearch() {
   const [inputValue, setInputValue] = useState(urlQuery);
   const [searchTerm, setSearchTerm] = useState(urlQuery);
   const [selectedBook, setSelectedBook] = useState<BookDetails | null>(null);
+
   const updateSearchTerm = useCallback((query: string) => {
     setSearchTerm(query);
   }, []);
@@ -43,11 +44,15 @@ export function useBookSearch() {
     [router, searchParams]
   );
 
-  const debouncedSearchUpdate = useCallback(debounce(updateSearchTerm, 250), [
-    updateSearchTerm,
-  ]);
+  const debouncedSearchUpdate = useMemo(
+    () => debounce(updateSearchTerm, 250),
+    [updateSearchTerm]
+  );
 
-  const debouncedUrlUpdate = useCallback(debounce(updateUrl, 350), [updateUrl]);
+  const debouncedUrlUpdate = useMemo(
+    () => debounce(updateUrl, 350),
+    [updateUrl]
+  );
 
   useEffect(() => {
     return () => {
@@ -111,37 +116,17 @@ export function useBookSearch() {
   const books = allBooks.slice(0, (data?.pages.length || 0) * booksPerPage);
   const totalResults = data?.pages[0]?.numFound || 0;
 
-
   const handleInputChange = useCallback(
     (query: string) => {
       setInputValue(query);
-
       debouncedSearchUpdate(query);
       debouncedUrlUpdate(query);
     },
     [debouncedSearchUpdate, debouncedUrlUpdate]
   );
 
-  const clearBooks = useCallback(() => {
-    setInputValue("");
-    setSearchTerm("");
-    setSelectedBook(null);
-
-    const params = new URLSearchParams(searchParams.toString());
-    if (params.get("type") === "books") {
-      params.delete("query");
-      params.delete("page");
-      params.delete("type");
-      router.replace(`?${params.toString()}`, { scroll: false });
-    }
-
-    queryClient.removeQueries({ queryKey: ["booksInfinite"] });
-    queryClient.removeQueries({ queryKey: ["bookDetails"] });
-  }, [queryClient, router, searchParams]);
-
   const selectBook = useCallback(
     async (id: string) => {
-   
       const cachedData = queryClient.getQueryData<BookDetails>([
         "bookDetails",
         id,
@@ -158,12 +143,10 @@ export function useBookSearch() {
     [queryClient, bookDetailsMutation]
   );
 
-
   const clearSelectedBook = useCallback(() => {
     setSelectedBook(null);
   }, []);
 
- 
   const error = queryError
     ? queryError instanceof Error
       ? queryError.message
@@ -181,7 +164,6 @@ export function useBookSearch() {
     search: handleInputChange,
     fetchNextPage,
     hasNextPage,
-    clearBooks,
     refetch,
     totalResults,
     selectedBook,

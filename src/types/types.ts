@@ -25,7 +25,6 @@ export type AppContextType = {
   selectBook: (id: string) => Promise<void>;
   clearSelectedMovie: () => void;
   clearSelectedBook: () => void;
-  clearAll: () => void;
 };
 
 export type AuthContextType = {

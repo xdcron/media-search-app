@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   useQueryClient,
   useInfiniteQuery,
@@ -44,11 +44,16 @@ export function useMovieSearch() {
     [router, searchParams]
   );
 
-  const debouncedSearchUpdate = useCallback(debounce(updateSearchTerm, 250), [
-    updateSearchTerm,
-  ]);
+  // Use useMemo instead of useCallback for debounced functions
+  const debouncedSearchUpdate = useMemo(
+    () => debounce(updateSearchTerm, 250),
+    [updateSearchTerm]
+  );
 
-  const debouncedUrlUpdate = useCallback(debounce(updateUrl, 350), [updateUrl]);
+  const debouncedUrlUpdate = useMemo(
+    () => debounce(updateUrl, 350),
+    [updateUrl]
+  );
 
   useEffect(() => {
     return () => {
@@ -121,23 +126,6 @@ export function useMovieSearch() {
     [debouncedSearchUpdate, debouncedUrlUpdate]
   );
 
-  const clearMovies = useCallback(() => {
-    setInputValue("");
-    setSearchTerm("");
-    setSelectedMovie(null);
-
-    const params = new URLSearchParams(searchParams.toString());
-    if (params.get("type") === "movies") {
-      params.delete("query");
-      params.delete("page");
-      params.delete("type");
-      router.replace(`?${params.toString()}`, { scroll: false });
-    }
-
-    queryClient.removeQueries({ queryKey: ["moviesInfinite"] });
-    queryClient.removeQueries({ queryKey: ["movieDetails"] });
-  }, [queryClient, router, searchParams]);
-
   const selectMovie = useCallback(
     async (id: string) => {
       const cachedData = queryClient.getQueryData<MovieDetails>([
@@ -177,7 +165,6 @@ export function useMovieSearch() {
     search: handleInputChange,
     fetchNextPage,
     hasNextPage,
-    clearMovies,
     refetch,
     totalResults,
     selectedMovie,

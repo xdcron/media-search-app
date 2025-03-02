@@ -21,7 +21,6 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     totalResults,
     search,
     fetchNextPage,
-    clearAll,
     moviesHook,
     booksHook,
   } = useMediaSearch();
@@ -48,7 +47,6 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     selectBook: booksHook.selectBook,
     clearSelectedMovie: moviesHook.clearSelectedMovie,
     clearSelectedBook: booksHook.clearSelectedBook,
-    clearAll,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

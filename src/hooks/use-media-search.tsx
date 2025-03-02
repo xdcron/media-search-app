@@ -64,25 +64,12 @@ export function useMediaSearch() {
     [activeMediaType, movies, books]
   );
 
-  const clearAll = useCallback(() => {
-    movies.clearMovies();
-    books.clearBooks();
-    router.replace("/", { scroll: false });
-  }, [movies, books, router]);
-
-  const results = activeMediaType === "movies" ? movies.movies : books.books;
-
-  const selectedItem =
-    activeMediaType === "movies" ? movies.selectedMovie : books.selectedBook;
-
   const isLoading =
     activeMediaType === "movies" ? movies.loading : books.loading;
   const isLoadingNextPage =
     activeMediaType === "movies"
       ? movies.isFetchingNextPage
       : books.isFetchingNextPage;
-
-  const error = activeMediaType === "movies" ? movies.error : books.error;
 
   const searchTerm =
     activeMediaType === "movies" ? movies.searchTerm : books.searchTerm;
@@ -104,32 +91,9 @@ export function useMediaSearch() {
       console.error(`Error fetching next page of ${activeMediaType}:`, error);
     }
   }, [activeMediaType, movies, books]);
-
-  const selectItem = useCallback(
-    (id: string) => {
-      if (activeMediaType === "movies") {
-        movies.selectMovie(id);
-      } else {
-        books.selectBook(id);
-      }
-    },
-    [activeMediaType, movies, books]
-  );
-
-  const clearSelectedItem = useCallback(() => {
-    if (activeMediaType === "movies") {
-      movies.clearSelectedMovie();
-    } else {
-      books.clearSelectedBook();
-    }
-  }, [activeMediaType, movies, books]);
-
   return {
-    results,
-    selectedItem,
     isLoading,
     isLoadingNextPage,
-    error,
     searchTerm,
     hasNextPage,
     totalResults,
@@ -137,9 +101,6 @@ export function useMediaSearch() {
     setActiveMediaType: handleMediaTypeChange,
     search,
     fetchNextPage,
-    selectItem,
-    clearSelectedItem,
-    clearAll,
     moviesHook: movies,
     booksHook: books,
   };
