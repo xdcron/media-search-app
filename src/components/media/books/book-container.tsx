@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { useAppContext } from "@/contexts/app-context";
 import { Book } from "@/types/book-types";
 import { getBookCoverUrl, getIdFromKey } from "@/lib/book-utils";
 import SelectSpinner from "../spinner";
-import { placeholderImageUrl } from "@/constants/contants";
+import FallBackIcon from "@/components/ui/fall-back";
+import MediaContainerImage from "@/components/ui/media-container-image";
 
 interface BookContainerProps {
   book: Book;
@@ -16,7 +16,6 @@ interface BookContainerProps {
 export default function BookContainer({ book }: BookContainerProps) {
   const { selectBook, isLoadingBookDetails } = useAppContext();
   const [isSelecting, setIsSelecting] = useState(false);
-  const [imageError, setImageError] = useState(false);
   const bookId = getIdFromKey(book.key);
 
   function handleSelectBook(id: string) {
@@ -25,10 +24,6 @@ export default function BookContainer({ book }: BookContainerProps) {
       setIsSelecting(false);
     });
   }
-
-  const handleImageError = () => {
-    setImageError(true);
-  };
 
   const isLoading = isSelecting && isLoadingBookDetails;
 
@@ -45,36 +40,16 @@ export default function BookContainer({ book }: BookContainerProps) {
       onClick={() => !isLoading && handleSelectBook(bookId)}
     >
       <div className="relative h-[150px] w-[100px] bg-muted flex-shrink-0 flex items-center justify-center">
-        {book.cover_i && !imageError ? (
+        {book.cover_i ? (
           <>
-            <div className="relative h-full w-full">
-              <Image
-                src={getBookCoverUrl(book.cover_i)}
-                alt={book.title}
-                fill
-                sizes="100px"
-                className="object-cover"
-                onError={handleImageError}
-              />
-            </div>
+            <MediaContainerImage
+              src={getBookCoverUrl(book.cover_i)}
+              title={book.title}
+            />
             {isLoading && <SelectSpinner />}
           </>
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-            {isLoading ? (
-              <div className="h-6 w-6 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-            ) : (
-              <div className="relative h-full w-full">
-                <Image
-                  src={placeholderImageUrl}
-                  alt={`${book.title} (cover unavailable)`}
-                  fill
-                  sizes="100px"
-                  className="object-cover"
-                />
-              </div>
-            )}
-          </div>
+          <FallBackIcon isLoading={isLoading} icon="📚" />
         )}
       </div>
 

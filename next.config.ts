@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       "www.yijiedesign.co",
       "covers.openlibrary.org",
       "m.media-amazon.com",
+      "via.placeholder.com",
     ],
   },
 };

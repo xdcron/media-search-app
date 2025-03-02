@@ -89,16 +89,21 @@ export function BookDetailSheet() {
     ? formatDescription(selectedBook.description)
     : "No description available.";
 
-  const excerptSection =
-    selectedBook.excerpts && selectedBook.excerpts.length > 0 ? (
-      <InfoSection
-        title="Excerpt"
-        content={`"${selectedBook.excerpts[0].excerpt.substring(0, 300)}${
-          selectedBook.excerpts[0].excerpt.length > 300 ? "..." : ""
-        }"`}
-        className="mt-6"
-      />
-    ) : null;
+  // Simple fix: convert excerpt to string safely
+  const excerptText =
+    selectedBook.excerpts && selectedBook.excerpts.length > 0
+      ? String(selectedBook.excerpts[0].excerpt || "")
+      : null;
+
+  const excerptSection = excerptText ? (
+    <InfoSection
+      title="Excerpt"
+      content={`"${excerptText.substring(0, 300)}${
+        excerptText.length > 300 ? "..." : ""
+      }"`}
+      className="mt-6"
+    />
+  ) : null;
 
   const linksSection =
     selectedBook.links && selectedBook.links.length > 0 ? (

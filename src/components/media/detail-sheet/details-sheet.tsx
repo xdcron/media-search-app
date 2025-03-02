@@ -9,12 +9,14 @@ import { DetailHeader, TagItem } from "./detail-header";
 import { InfoSection } from "./info-section";
 import { DetailsGrid, DetailSection } from "./details-grid";
 import { FooterInfo } from "./footer";
+import { MovieDetails } from "@/types/movie-types";
+import { BookDetails } from "@/types/book-types";
 
 export interface DetailSheetProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   isLoading: boolean;
-  item: Record<string, any> | null;
+  item: MovieDetails | BookDetails | null;
   imageUrl?: string | null;
   title: string;
   year?: string | null;

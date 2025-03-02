@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { useAppContext } from "@/contexts/app-context";
 import { Movie } from "@/types/movie-types";
 import SelectSpinner from "../spinner";
+import FallBackIcon from "@/components/ui/fall-back";
+import MediaContainerImage from "@/components/ui/media-container-image";
 
 interface MovieContainerProps {
   movie: Movie;
@@ -39,26 +40,11 @@ export default function MovieContainer({ movie }: MovieContainerProps) {
       <div className="relative h-[150px] w-[100px] bg-muted flex-shrink-0 flex items-center justify-center">
         {movie.Poster && movie.Poster !== "N/A" ? (
           <>
-            <div className="relative h-full w-full">
-              <Image
-                src={movie.Poster || "/placeholder.svg"}
-                alt={movie.Title}
-                fill
-                sizes="100px"
-                className="object-cover"
-                priority={false}
-              />
-            </div>
+            <MediaContainerImage src={movie.Poster} title={movie.Title} />
             {isLoading && <SelectSpinner />}
           </>
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-            {isLoading ? (
-              <div className="h-6 w-6 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-            ) : (
-              <span className="text-2xl">🎬</span>
-            )}
-          </div>
+          <FallBackIcon isLoading={isLoading} icon="🎬" />
         )}
       </div>
       <div className="p-3 flex flex-col justify-between flex-1">
