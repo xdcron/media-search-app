@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import Logo from "./ui/logo";
-import SearchBar from "./ui/search-bar";
-import { ThemeToggle } from "./ui/theme-toggle";
+import Logo from "./logo";
+import SearchBar from "./search-bar";
+import { ThemeToggle } from "./theme-toggle";
 import { Menu, LogIn, UserPlus, LogOut, User } from "lucide-react";
-import MediaTypeToggle from "./ui/media-toggle";
+import MediaTypeToggle from "./media-toggle";
 import { useAuth } from "@/contexts/auth-context";
 import { toast } from "sonner";
 import {
@@ -38,6 +38,7 @@ function NavBar() {
       await logout();
       toast.success("Successfully logged out");
     } catch (error) {
+      console.error(error);
       toast.error("Failed to log out");
     }
   };

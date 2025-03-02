@@ -45,8 +45,8 @@ export function NoResultsMessage({
         <BookOpen className="h-12 w-12  mb-4 text-neon-glow-strong" />
       )}
       <p className="text-center text-muted-foreground">
-        No {activeMediaType} found for "
-        <span className="font-medium">{searchTerm}</span>".
+        No {activeMediaType} found for &quot;
+        <span className="font-medium">{searchTerm}</span>&quot;.
       </p>
     </div>
   );

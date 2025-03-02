@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { useAppContext } from "@/contexts/app-context";
 import { Book } from "@/types/book-types";
@@ -46,12 +47,16 @@ export default function BookContainer({ book }: BookContainerProps) {
       <div className="relative h-[150px] w-[100px] bg-muted flex-shrink-0 flex items-center justify-center">
         {book.cover_i && !imageError ? (
           <>
-            <img
-              src={getBookCoverUrl(book.cover_i)}
-              alt={book.title}
-              className="h-full w-full object-cover"
-              onError={handleImageError}
-            />
+            <div className="relative h-full w-full">
+              <Image
+                src={getBookCoverUrl(book.cover_i)}
+                alt={book.title}
+                fill
+                sizes="100px"
+                className="object-cover"
+                onError={handleImageError}
+              />
+            </div>
             {isLoading && <SelectSpinner />}
           </>
         ) : (
@@ -59,11 +64,15 @@ export default function BookContainer({ book }: BookContainerProps) {
             {isLoading ? (
               <div className="h-6 w-6 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
             ) : (
-              <img
-                src={placeholderImageUrl}
-                alt={`${book.title} (cover unavailable)`}
-                className="h-full w-full object-cover"
-              />
+              <div className="relative h-full w-full">
+                <Image
+                  src={placeholderImageUrl}
+                  alt={`${book.title} (cover unavailable)`}
+                  fill
+                  sizes="100px"
+                  className="object-cover"
+                />
+              </div>
             )}
           </div>
         )}

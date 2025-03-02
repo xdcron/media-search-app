@@ -44,7 +44,6 @@ export function useMovieSearch() {
     [router, searchParams]
   );
 
-  // Use useMemo instead of useCallback for debounced functions
   const debouncedSearchUpdate = useMemo(
     () => debounce(updateSearchTerm, 250),
     [updateSearchTerm]

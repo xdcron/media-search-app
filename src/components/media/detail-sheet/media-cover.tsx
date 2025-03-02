@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface MediaCoverProps {
   imageUrl?: string | null;
   title: string;
@@ -16,13 +18,17 @@ export function MediaCover({
       className={`relative w-full flex items-center justify-center bg-muted ${className}`}
     >
       {imageUrl ? (
-        <div className="flex h-full w-full items-center justify-center overflow-hidden">
-          <img
-            src={imageUrl}
-            alt={title}
-            className="max-h-full max-w-full object-contain"
-            loading="lazy"
-          />
+        <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
+          <div className="relative h-full w-full flex items-center justify-center">
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-contain"
+              priority={false}
+            />
+          </div>
         </div>
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-muted">

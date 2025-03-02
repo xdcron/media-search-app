@@ -1,5 +1,7 @@
 "use client";
+
 import { useState } from "react";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { useAppContext } from "@/contexts/app-context";
 import { Movie } from "@/types/movie-types";
@@ -37,11 +39,16 @@ export default function MovieContainer({ movie }: MovieContainerProps) {
       <div className="relative h-[150px] w-[100px] bg-muted flex-shrink-0 flex items-center justify-center">
         {movie.Poster && movie.Poster !== "N/A" ? (
           <>
-            <img
-              src={movie.Poster || "/placeholder.svg"}
-              alt={movie.Title}
-              className="h-full w-full object-cover"
-            />
+            <div className="relative h-full w-full">
+              <Image
+                src={movie.Poster || "/placeholder.svg"}
+                alt={movie.Title}
+                fill
+                sizes="100px"
+                className="object-cover"
+                priority={false}
+              />
+            </div>
             {isLoading && <SelectSpinner />}
           </>
         ) : (
