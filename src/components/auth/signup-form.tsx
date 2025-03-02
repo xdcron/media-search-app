@@ -1,82 +1,35 @@
 "use client";
 
-import { useState, FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { useAuth } from "@/contexts/auth-context";
 import { FormInput } from "./form-input";
-import { FormData, FormErrors } from "@/types/types";
-import { FirebaseError } from "firebase/app";
-import { validateSignupForm } from "@/lib/form-validation-utils";
 import SubmitButton from "./submit-button";
+import { useAuthForm } from "@/hooks/use-auth-form";
 
-interface SignUpFormData extends FormData {
-  confirmPassword: string;
-}
-
-interface SignUpFormErrors extends FormErrors {
+interface SignUpFormData {
+  email: string;
+  password: string;
   confirmPassword: string;
 }
 
 export function SignupForm() {
-  const [formData, setFormData] = useState<SignUpFormData>({
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
-  const [errors, setErrors] = useState<SignUpFormErrors>({
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-  const { signup } = useAuth();
-  const router = useRouter();
-
-  function handleInputChange(field: keyof SignUpFormData) {
-    return function (value: string): void {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    };
-  }
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
-    e.preventDefault();
-    setErrors({ email: "", password: "", confirmPassword: "" });
-
-    const { errors: validationErrors, isValid } = validateSignupForm(formData);
-
-    if (!isValid) {
-      setErrors(validationErrors as SignUpFormErrors);
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-      await signup(formData.email, formData.password);
-      router.push("/");
-    } catch (error) {
-      const err = error as FirebaseError;
-      let errorMessage = "Failed to create an account";
-
-      switch (err.code) {
-        case "auth/email-already-in-use":
-          errorMessage = "Email is already in use";
-          break;
-        case "auth/invalid-email":
-          errorMessage = "Invalid email address";
-          break;
-      }
-
-      toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
+  const { formData, isSubmitting, handleInputChange, handleSubmit } =
+    useAuthForm<SignUpFormData>({
+      initialState: {
+        email: "",
+        password: "",
+        confirmPassword: "",
+      },
+      authAction: "signup",
+      validateForm: (data) => {
+        if (data.password !== data.confirmPassword) {
+          return "Passwords do not match";
+        }
+        if (data.password.length < 6) {
+          return "Password must be at least 6 characters long";
+        }
+        return null;
+      },
+    });
 
   return (
     <div className="w-full max-w-md">
@@ -91,7 +44,6 @@ export function SignupForm() {
           onChange={handleInputChange("email")}
           placeholder="Enter your email"
           required
-          error={errors.email}
         />
 
         <FormInput
@@ -102,7 +54,6 @@ export function SignupForm() {
           onChange={handleInputChange("password")}
           placeholder="Enter your password"
           required
-          error={errors.password}
         />
 
         <FormInput
@@ -113,7 +64,6 @@ export function SignupForm() {
           onChange={handleInputChange("confirmPassword")}
           placeholder="Confirm your password"
           required
-          error={errors.confirmPassword}
         />
 
         <SubmitButton isSubmitting={isSubmitting}>

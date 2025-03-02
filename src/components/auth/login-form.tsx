@@ -1,73 +1,20 @@
 "use client";
 
-import { useState, FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { useAuth } from "@/contexts/auth-context";
 import { FormInput } from "./form-input";
-import { FormData, FormErrors } from "@/types/types";
-import { FirebaseError } from "firebase/app";
-import { validateLoginForm } from "@/lib/form-validation-utils";
+import { FormData } from "@/types/types";
 import SubmitButton from "./submit-button";
+import { useAuthForm } from "@/hooks/use-auth-form";
 
 export function LoginForm() {
-  const [formData, setFormData] = useState<FormData>({
-    email: "",
-    password: "",
-  });
-  const [errors, setErrors] = useState<FormErrors>({
-    email: "",
-    password: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-  const { login } = useAuth();
-  const router = useRouter();
-
-  function handleInputChange(field: keyof FormData) {
-    return function (value: string): void {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    };
-  }
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
-    e.preventDefault();
-    setErrors({ email: "", password: "" });
-    const { errors: validationErrors, isValid } = validateLoginForm(formData);
-
-    if (!isValid) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-      await login(formData.email, formData.password);
-      router.push("/");
-    } catch (error) {
-      const err = error as FirebaseError;
-      let errorMessage = "Failed to log in";
-
-      switch (err.code) {
-        case "auth/invalid-credential":
-          errorMessage = "Invalid email or password";
-          break;
-        case "auth/user-not-found":
-          errorMessage = "No account associated with this email";
-          break;
-        case "auth/wrong-password":
-          errorMessage = "Incorrect password";
-          break;
-      }
-
-      toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
+  const { formData, isSubmitting, handleInputChange, handleSubmit } =
+    useAuthForm<FormData>({
+      initialState: {
+        email: "",
+        password: "",
+      },
+      authAction: "login",
+    });
 
   return (
     <div className="w-full max-w-md">
@@ -82,7 +29,6 @@ export function LoginForm() {
           onChange={handleInputChange("email")}
           placeholder="Enter your email"
           required
-          error={errors.email}
         />
 
         <FormInput
@@ -93,7 +39,6 @@ export function LoginForm() {
           onChange={handleInputChange("password")}
           placeholder="Enter your password"
           required
-          error={errors.password}
         />
         <SubmitButton isSubmitting={isSubmitting}>
           {isSubmitting ? "Logging In..." : "Log In"}

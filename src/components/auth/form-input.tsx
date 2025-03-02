@@ -13,7 +13,6 @@ export interface FormInputProps {
   onChange: (value: string) => void;
   placeholder?: string;
   required?: boolean;
-  error?: string;
   className?: string;
 }
 
@@ -25,7 +24,7 @@ export function FormInput({
   onChange,
   placeholder,
   required = false,
-  error,
+
   className = "",
 }: FormInputProps) {
   const [showPassword, setShowPassword] = useState(false);
@@ -50,7 +49,7 @@ export function FormInput({
           value={value}
           onChange={handleChange}
           required={required}
-          className={`${className} ${error ? "border-destructive" : ""}`}
+          className={`${className} `}
         />
         {isPasswordInput && (
           <button
@@ -63,7 +62,6 @@ export function FormInput({
           </button>
         )}
       </div>
-      {error && <p className="text-destructive text-sm mt-1">{error}</p>}
     </div>
   );
 }
