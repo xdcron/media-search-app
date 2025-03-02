@@ -88,7 +88,6 @@ function NavBar() {
                 className="flex cursor-pointer hover:text-neon-glow-strong items-center gap-1 text-sm text-muted-foreground transition-colors"
               >
                 <LogOut size={16} />
-                Logout
               </button>
             </>
           ) : (
