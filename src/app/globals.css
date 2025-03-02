@@ -18,8 +18,11 @@
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+
+  /* Neon blue secondary color in OKLCH format */
+  --secondary: oklch(0.7 0.2 240);
+  --secondary-foreground: oklch(1 0 0);
+
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.97 0 0);
@@ -28,12 +31,15 @@
   --destructive-foreground: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --ring: oklch(0.7 0.2 240); /* Match with secondary */
+
+  /* Chart colors with neon blue as primary */
+  --chart-1: oklch(0.7 0.2 240);
+  --chart-2: oklch(0.75 0.15 240);
+  --chart-3: oklch(0.65 0.25 240);
+  --chart-4: oklch(0.7 0.2 260);
+  --chart-5: oklch(0.7 0.2 220);
+
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -43,6 +49,11 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Neon glow colors */
+  --neon-glow: oklch(0.7 0.2 240);
+  --neon-glow-light: oklch(0.75 0.15 240);
+  --neon-glow-strong: oklch(0.65 0.25 240);
 }
 
 .dark {
@@ -54,8 +65,11 @@
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.985 0 0);
   --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
+
+  /* Brighter neon blue for dark mode */
+  --secondary: oklch(0.75 0.25 240);
+  --secondary-foreground: oklch(1 0 0);
+
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);
@@ -64,20 +78,28 @@
   --destructive-foreground: oklch(0.637 0.237 25.331);
   --border: oklch(0.269 0 0);
   --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
+  --ring: oklch(0.75 0.25 240); /* Match with secondary */
+
+  /* Chart colors with neon blue as primary for dark mode */
+  --chart-1: oklch(0.75 0.25 240);
+  --chart-2: oklch(0.8 0.2 240);
+  --chart-3: oklch(0.7 0.3 240);
+  --chart-4: oklch(0.75 0.25 260);
+  --chart-5: oklch(0.75 0.25 220);
+
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary: oklch(0.75 0.25 240); /* Match with secondary */
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+
+  /* Neon glow colors for dark mode - brighter for better visibility */
+  --neon-glow: oklch(0.75 0.25 240);
+  --neon-glow-light: oklch(0.8 0.2 240);
+  --neon-glow-strong: oklch(0.7 0.3 240);
 }
 
 @theme inline {
@@ -117,6 +139,9 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-neon-glow: var(--neon-glow);
+  --color-neon-glow-light: var(--neon-glow-light);
+  --color-neon-glow-strong: var(--neon-glow-strong);
 }
 
 @layer base {
@@ -126,4 +151,70 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer utilities {
+  /* Custom utility classes for neon effects */
+  .text-neon {
+    color: oklch(var(--color-secondary));
+    text-shadow: 0 0 5px oklch(var(--color-neon-glow) / 0.7);
+  }
+
+  .border-neon {
+    border-color: oklch(var(--color-secondary));
+    box-shadow: 0 0 5px oklch(var(--color-neon-glow) / 0.5);
+  }
+
+  .shadow-neon {
+    box-shadow: 0 0 5px oklch(var(--color-neon-glow) / 0.5),
+      0 0 10px oklch(var(--color-neon-glow) / 0.3);
+  }
+
+  .shadow-neon-strong {
+    box-shadow: 0 0 7px oklch(var(--color-neon-glow) / 0.7),
+      0 0 15px oklch(var(--color-neon-glow) / 0.5),
+      0 0 25px oklch(var(--color-neon-glow) / 0.2);
+  }
+
+  .bg-neon-gradient {
+    background: linear-gradient(
+      135deg,
+      oklch(var(--color-secondary)) 0%,
+      oklch(var(--color-neon-glow-strong)) 100%
+    );
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px oklch(var(--color-neon-glow) / 0.5),
+      0 0 10px oklch(var(--color-neon-glow) / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px oklch(var(--color-neon-glow) / 0.8),
+      0 0 20px oklch(var(--color-neon-glow) / 0.5);
+  }
+}
+
+.animate-neon-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* For webkit-based browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: oklch(var(--color-background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(var(--color-secondary) / 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(var(--color-secondary) / 0.8);
 }

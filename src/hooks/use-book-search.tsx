@@ -6,21 +6,20 @@ import {
   useInfiniteQuery,
   useMutation,
 } from "@tanstack/react-query";
-import { searchMovies, getMovieDetails } from "@/lib/movie-utils";
+import { searchBooks, getBookDetails } from "@/lib/book-utils";
 import { debounce } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
-import { MovieDetails } from "@/types/movie-types";
+import { BookDetails } from "@/types/book-types";
 
-export function useMovieSearch() {
+export function useBookSearch() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+
   const urlQuery = searchParams.get("query") || "";
   const [inputValue, setInputValue] = useState(urlQuery);
   const [searchTerm, setSearchTerm] = useState(urlQuery);
-
-  const [selectedMovie, setSelectedMovie] = useState<MovieDetails | null>(null);
-
+  const [selectedBook, setSelectedBook] = useState<BookDetails | null>(null);
   const updateSearchTerm = useCallback((query: string) => {
     setSearchTerm(query);
   }, []);
@@ -32,7 +31,7 @@ export function useMovieSearch() {
       if (query.trim().length > 0) {
         params.set("query", query);
         params.set("page", "1");
-        params.set("type", "movies");
+        params.set("type", "books");
       } else {
         params.delete("query");
         params.delete("page");
@@ -61,10 +60,10 @@ export function useMovieSearch() {
     const newQuery = searchParams.get("query") || "";
     const type = searchParams.get("type");
 
-    if (type === "movies" && inputValue !== newQuery) {
+    if (type === "books" && inputValue !== newQuery) {
       setInputValue(newQuery);
     }
-    if (type === "movies" && searchTerm !== newQuery) {
+    if (type === "books" && searchTerm !== newQuery) {
       setSearchTerm(newQuery);
     }
   }, [searchParams, inputValue, searchTerm]);
@@ -77,13 +76,15 @@ export function useMovieSearch() {
     error: queryError,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ["moviesInfinite", searchTerm],
-    queryFn: ({ pageParam = 1 }) => searchMovies(searchTerm, pageParam),
+    queryKey: ["booksInfinite", searchTerm],
+    queryFn: async ({ pageParam = 1 }) => {
+      return searchBooks(searchTerm, pageParam, 20);
+    },
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
-      const totalResults = parseInt(lastPage.totalResults || "0");
+      const totalResults = lastPage.numFound || 0;
       const loadedCount = allPages.reduce(
-        (count, page) => count + (page.Search?.length || 0),
+        (count, page) => count + (page.docs?.length || 0),
         0
       );
       return loadedCount < totalResults ? allPages.length + 1 : undefined;
@@ -92,84 +93,87 @@ export function useMovieSearch() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const movieDetailsMutation = useMutation({
+  const bookDetailsMutation = useMutation({
     mutationFn: async (id: string) => {
-      return getMovieDetails(id);
+      return getBookDetails(id);
     },
     onSuccess: (data) => {
-      setSelectedMovie(data);
-      queryClient.setQueryData(["movieDetails", data.imdbID], data);
+      setSelectedBook(data);
+      queryClient.setQueryData(["bookDetails", data.key], data);
     },
     onError: (error: Error) => {
-      console.error("Movie details error:", error);
+      console.error("Book details error:", error);
     },
   });
 
-  const allMovies = data?.pages.flatMap((page) => page.Search || []) || [];
-  const moviesPerPage = 10;
-  const movies = allMovies.slice(0, (data?.pages.length || 0) * moviesPerPage);
-  const totalResults = data?.pages[0]?.totalResults
-    ? parseInt(data.pages[0].totalResults)
-    : 0;
+  const allBooks = data?.pages.flatMap((page) => page.docs || []) || [];
+  const booksPerPage = 20;
+  const books = allBooks.slice(0, (data?.pages.length || 0) * booksPerPage);
+  const totalResults = data?.pages[0]?.numFound || 0;
+
 
   const handleInputChange = useCallback(
     (query: string) => {
       setInputValue(query);
+
       debouncedSearchUpdate(query);
       debouncedUrlUpdate(query);
     },
     [debouncedSearchUpdate, debouncedUrlUpdate]
   );
 
-  const clearMovies = useCallback(() => {
+  const clearBooks = useCallback(() => {
     setInputValue("");
     setSearchTerm("");
-    setSelectedMovie(null);
+    setSelectedBook(null);
 
     const params = new URLSearchParams(searchParams.toString());
-    if (params.get("type") === "movies") {
+    if (params.get("type") === "books") {
       params.delete("query");
       params.delete("page");
       params.delete("type");
       router.replace(`?${params.toString()}`, { scroll: false });
     }
 
-    queryClient.removeQueries({ queryKey: ["moviesInfinite"] });
-    queryClient.removeQueries({ queryKey: ["movieDetails"] });
+    queryClient.removeQueries({ queryKey: ["booksInfinite"] });
+    queryClient.removeQueries({ queryKey: ["bookDetails"] });
   }, [queryClient, router, searchParams]);
 
-  const selectMovie = useCallback(
+  const selectBook = useCallback(
     async (id: string) => {
-      const cachedData = queryClient.getQueryData<MovieDetails>([
-        "movieDetails",
+   
+      const cachedData = queryClient.getQueryData<BookDetails>([
+        "bookDetails",
         id,
       ]);
 
       if (cachedData) {
-        console.log("Using cached movie details for:", id);
-        setSelectedMovie(cachedData);
+        console.log("Using cached book details for:", id);
+        setSelectedBook(cachedData);
         return;
       }
 
-      await movieDetailsMutation.mutateAsync(id);
+      await bookDetailsMutation.mutateAsync(id);
     },
-    [queryClient, movieDetailsMutation]
+    [queryClient, bookDetailsMutation]
   );
 
-  const clearSelectedMovie = useCallback(() => {
-    setSelectedMovie(null);
+
+  const clearSelectedBook = useCallback(() => {
+    setSelectedBook(null);
   }, []);
 
+ 
   const error = queryError
     ? queryError instanceof Error
       ? queryError.message
-      : "Failed to search movies"
+      : "Failed to search books"
     : "";
 
-  const hasNextPage = movies.length < totalResults;
+  const hasNextPage = books.length < totalResults;
 
   return {
-    movies,
+    books,
     loading,
     isFetchingNextPage,
     error,
@@ -177,12 +181,12 @@ export function useMovieSearch() {
     search: handleInputChange,
     fetchNextPage,
     hasNextPage,
-    clearMovies,
+    clearBooks,
     refetch,
     totalResults,
-    selectedMovie,
-    selectMovie,
-    clearSelectedMovie,
-    isLoadingMovieDetails: movieDetailsMutation.isPending,
+    selectedBook,
+    selectBook,
+    clearSelectedBook,
+    isLoadingBookDetails: bookDetailsMutation.isPending,
   };
 }

@@ -1,4 +1,4 @@
-import MediaListContainer from "@/components/main/media-list-container";
+import MediaListContainer from "@/components/media/media-list-container";
 
 export default function Home() {
   return (

@@ -1,4 +1,4 @@
-import { MovieDetails, MovieSearchResult } from "@/types/types";
+import { MovieDetails, MovieSearchResult } from "@/types/movie-types";
 
 export async function searchMovies(
   query: string,
